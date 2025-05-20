@@ -8,7 +8,6 @@ import { ResolveToml } from '../utils/resolveToml';
  */
 export class Auth {
 	private readonly networkPassphrase: Networks;
-
 	/**
 	 * Create a new Auth instance
 	 * @param options Configuration options
