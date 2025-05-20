@@ -16,7 +16,7 @@
 	"typescript.preferences.quoteStyle": "single",
 	"prettier.semi": true,
 	"prettier.singleQuote": true,
-	"prettier.tabWidth": 2,
+	"prettier.tabWidth": 1,
 	"prettier.printWidth": 100,
 
 	"jest.runMode": "on-demand",
