@@ -10,6 +10,7 @@ import { ResolveToml } from '../utils/resolveToml';
 export class Auth {
 	networkPassphrase: Networks;
 	testnetDomain: string;
+
 	/**
 	 * Create a new Auth instance
 	 * @param options Configuration options
