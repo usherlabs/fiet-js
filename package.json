@@ -1,7 +1,7 @@
 {
 	"name": "@fiet/js",
 	"description": "Fiet makes deeply liquid AMM markets powered by dynamic reserve liquidity.",
-	"repository": "git@gitlab.com:usherlabs/fiet-js.git"
+	"repository": "git@gitlab.com:usherlabs/fiet-js.git",
 	"homepage": "https://fiet.finance/",
 	"author": "Usher Labs <labs@usher.so>",
 	"version": "0.0.1",
@@ -11,9 +11,7 @@
 		"main": "npx ts-node src/index.ts"
 	},
 	"keywords": [],
-	"author": "",
 	"license": "ISC",
-	"description": "",
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.15.18",
