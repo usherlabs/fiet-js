@@ -1,6 +1,10 @@
 {
-	"name": "fiet",
-	"version": "1.0.0",
+	"name": "@fiet/js",
+	"description": "Fiet makes deeply liquid AMM markets powered by dynamic reserve liquidity.",
+	"repository": "git@gitlab.com:usherlabs/fiet-js.git"
+	"homepage": "https://fiet.finance/",
+	"author": "Usher Labs <labs@usher.so>",
+	"version": "0.0.1",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
