@@ -3,9 +3,10 @@ import { QuoteParams, QuoteResult, SEP38Info, SEP38InfoResponse } from '../types
 import { TESTNET_DOMAIN } from '../utils/constants';
 import { ResolveToml } from '../utils/resolveToml';
 
-export class QuoteSep38 {
+export class Quote {
 	assetsHash: Record<string, { id: string }> = {};
 	testnetDomain: string;
+
 	/**
 	 * Create a new Quote instance
 	 * @param options Configuration options
@@ -16,11 +17,11 @@ export class QuoteSep38 {
 
 	async getQuote({ base, quote, amount, authToken, domain }: QuoteParams): Promise<QuoteResult> {
 		try {
-			const getDomain = domain || this.testnetDomain;
-			const quoteUrl = await this.getQuotePoint(getDomain);
+			const anchorDomain = domain || this.testnetDomain;
+			const { quotePoint: quoteUrl } = await this.getQuotePoint({ url: anchorDomain });
 
 			if (Object.keys(this.assetsHash).length === 0) {
-				await this.getInfo({ url: quoteUrl });
+				await this.getInfo({ infoUrl: quoteUrl });
 			}
 
 			const response = await axios.get(`${quoteUrl}/price`, {
@@ -54,21 +55,21 @@ export class QuoteSep38 {
 		}
 	}
 
-	async getInfo(option: { url: string }) {
+	async getInfo(domain: { infoUrl: string }) {
 		try {
-			const response: AxiosResponse = await axios.get(`${option.url}/info`);
+			const response: AxiosResponse = await axios.get(`${domain.infoUrl}/info`);
 			const data: SEP38InfoResponse = await response.data;
 			this.assetsMapping(data);
 		} catch {
-			throw new Error(`Failed to get SEP-38 info for domain: ${option.url}`);
+			throw new Error(`Failed to get SEP-38 info for domain: ${domain.infoUrl}`);
 		}
 	}
 
-	assetsMapping(infoResponse: SEP38InfoResponse) {
-		if (!infoResponse) {
+	assetsMapping({ assets }: SEP38InfoResponse) {
+		if (assets.length === 0) {
 			throw new Error('Invalid SEP38 info');
 		}
-		infoResponse.assets.forEach((assetsInfo: SEP38Info) => {
+		assets.forEach((assetsInfo: SEP38Info) => {
 			const assetId = assetsInfo.asset;
 			const parts = assetId.split(':');
 			const assetCode = parts[1];
@@ -81,14 +82,14 @@ export class QuoteSep38 {
 	 * @param domain - The domain to get the web auth endpoint from
 	 * @returns The SEP38 - quote endpoint URL
 	 */
-	async getQuotePoint(domain: string): Promise<string> {
+	async getQuotePoint(domain: { url: string }): Promise<{ quotePoint: string }> {
 		try {
-			const tomlResolver = new ResolveToml({ anchorUrl: domain });
+			const tomlResolver = new ResolveToml({ anchorUrl: domain.url });
 			const tomlFile = await tomlResolver.getTomlFile();
 			if (!tomlFile.ANCHOR_QUOTE_SERVER) {
 				throw new Error(`No SEP38 url find in domain: ${domain}`);
 			}
-			return tomlFile.ANCHOR_QUOTE_SERVER;
+			return { quotePoint: tomlFile.ANCHOR_QUOTE_SERVER };
 		} catch (error) {
 			throw new Error(`Failed to get the SEP38 url for domain: ${domain}`);
 		}

@@ -1,6 +1,6 @@
-import { Keypair, Networks, Transaction } from '@stellar/stellar-sdk';
+import { Networks, Transaction } from '@stellar/stellar-sdk';
 import axios from 'axios';
-import { AuthResult } from '../types/SEP10-types';
+import { AuthParams, AuthResult } from '../types/SEP10-types';
 import { TESTNET_DOMAIN } from '../utils/constants';
 import { ResolveToml } from '../utils/resolveToml';
 
@@ -25,13 +25,14 @@ export class Auth {
 	 * @param options options for authentication
 	 * @returns auth token and account's public key
 	 */
-	async getAuthToken(options: { account: Keypair; domain?: string }): Promise<AuthResult> {
+	async getAuthToken({ account, domain }: AuthParams): Promise<AuthResult> {
 		try {
-			const authurl = await this.getWebAuthPoint(options.domain || this.testnetDomain);
+			const anchorDomain = domain || this.testnetDomain;
+			const { webAuthPoint } = await this.getWebAuthPoint({ url: anchorDomain });
 			// get SEP10 challenge transactions
-			const responseChallenge = await axios.get(authurl, {
+			const responseChallenge = await axios.get(webAuthPoint, {
 				params: {
-					account: options.account.publicKey(),
+					account: account.publicKey(),
 				},
 			});
 
@@ -39,12 +40,12 @@ export class Auth {
 
 			// sign the `challengeTransaction`
 			const transaction = new Transaction(challengeTransaction, this.networkPassphrase);
-			transaction.sign(options.account);
+			transaction.sign(account);
 
 			// Submit challenge
-			const response = await axios.post(authurl, { transaction: transaction.toXDR() });
+			const response = await axios.post(webAuthPoint, { transaction: transaction.toXDR() });
 			const data = await response.data;
-			return { token: data.token, account: options.account.publicKey() };
+			return { token: data.token, account: account.publicKey() };
 		} catch (error) {
 			throw new Error(`Failed to authenticate with SEP10: ${error}`);
 		}
@@ -55,15 +56,14 @@ export class Auth {
 	 * @param domain - The domain to get the web auth endpoint from
 	 * @returns The web auth endpoint URL
 	 */
-	async getWebAuthPoint(domain?: string): Promise<string> {
+	async getWebAuthPoint(domain: { url: string }): Promise<{ webAuthPoint: string }> {
 		try {
-			const getDomain = domain || this.testnetDomain;
-			const tomlResolver = new ResolveToml({ anchorUrl: getDomain });
+			const tomlResolver = new ResolveToml({ anchorUrl: domain.url });
 			const tomlFile = await tomlResolver.getTomlFile();
 			if (!tomlFile.WEB_AUTH_ENDPOINT) {
-				throw new Error(`No SEP10 url find in domain: ${getDomain}`);
+				throw new Error(`No SEP10 url find in domain: ${domain.url}`);
 			}
-			return tomlFile.WEB_AUTH_ENDPOINT;
+			return { webAuthPoint: tomlFile.WEB_AUTH_ENDPOINT };
 		} catch (error) {
 			throw new Error(`Failed to get the SEP10 url for domain: ${domain || this.testnetDomain}`);
 		}
