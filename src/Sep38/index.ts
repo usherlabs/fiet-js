@@ -23,7 +23,6 @@ export class Quote {
 			if (Object.keys(this.assetsHash).length === 0) {
 				await this.getInfo({ infoUrl: quoteUrl });
 			}
-
 			const response = await axios.get(`${quoteUrl}/price`, {
 				params: {
 					sell_asset: this.assetsHash[base].id,
@@ -47,7 +46,6 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				console.error(axiosError.response?.data);
 				throw new Error(`${axiosError.code}, error code: ${axiosError.status}`);
 			}
 

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { DepositParams, StellarTransactionResult, WithdrawParamas } from '../types/SEP24-types';
 import { TESTNET_DOMAIN } from '../utils/constants';
 import { ResolveToml } from '../utils/resolveToml';
@@ -29,12 +29,12 @@ export class InteractiveTransactions {
 				{
 					asset_code: 'SRT',
 					account: address,
-					amount: baseAmount,
+					amount: baseAmount.toString(),
 				},
 				{
 					headers: {
 						Authorization: `Bearer ${authToken}`,
-						'Content-Type': 'application/x-www-form-urlencoded',
+						'Content-Type': 'application/json',
 					},
 				}
 			);
@@ -43,9 +43,26 @@ export class InteractiveTransactions {
 				url: response.data.url,
 				anchorId: response.data.id,
 			};
-		} catch (err) {
-			console.error('Error depositing via SEP-24', err);
-			throw err;
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+
+				switch (axiosError.response?.status) {
+					case 500:
+						throw new Error(
+							'Anchor service is experiencing technical difficulties. Please try again later.'
+						);
+					case 502:
+						throw new Error('Anchor service is temporarily unavailable (Bad Gateway).');
+					case 404:
+						throw new Error('Endpoint not found. Check the URL.');
+					default:
+						throw new Error(
+							`API error ${axiosError.response?.status}: ${axiosError.response?.statusText}`
+						);
+				}
+			}
+			throw error;
 		}
 	}
 
