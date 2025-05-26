@@ -1,7 +1,12 @@
-import axios from 'axios';
-import { DepositParams, StellarTransactionResult, WithdrawParamas } from '../types/SEP24-types';
-import { TESTNET_DOMAIN } from '../utils/constants';
-import { ResolveToml } from '../utils/resolveToml';
+import axios, { AxiosError } from 'axios';
+import { FietError } from '../common/types/fiet-error';
+import {
+	DepositParams,
+	StellarTransactionResult,
+	WithdrawParamas,
+} from '../common/types/SEP24-types';
+import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { ResolveToml } from '../common/utils/resolveToml';
 
 export class InteractiveTransactions {
 	testnetDomain: string;
@@ -27,14 +32,14 @@ export class InteractiveTransactions {
 			const response = await axios.post(
 				`${sep24Url!}/transactions/deposit/interactive`,
 				{
-					asset_code: 'SRT',
+					asset_code: 'USDC',
 					account: address,
-					amount: baseAmount,
+					amount: baseAmount.toString(),
 				},
 				{
 					headers: {
 						Authorization: `Bearer ${authToken}`,
-						'Content-Type': 'application/x-www-form-urlencoded',
+						'Content-Type': 'application/json',
 					},
 				}
 			);
@@ -43,9 +48,12 @@ export class InteractiveTransactions {
 				url: response.data.url,
 				anchorId: response.data.id,
 			};
-		} catch (err) {
-			console.error('Error depositing via SEP-24', err);
-			throw err;
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-24 Deposit Error: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to perform deposit with SEP-24: ${error}`);
 		}
 	}
 
@@ -78,9 +86,12 @@ export class InteractiveTransactions {
 				url: response.data.url,
 				anchorId: response.data.id,
 			};
-		} catch (err) {
-			console.error('Error withdrawing via SEP-24', err);
-			throw err;
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-24 Withdraw Error: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to perform withdraw with SEP-24: ${error}`);
 		}
 	}
 
@@ -94,11 +105,15 @@ export class InteractiveTransactions {
 			const tomlResolver = new ResolveToml({ anchorUrl: domain.url });
 			const tomlFile = await tomlResolver.getTomlFile();
 			if (!tomlFile.TRANSFER_SERVER_SEP0024) {
-				throw new Error(`No SEP24 url find in domain: ${domain.url}`);
+				throw new Error(`No SEP-24 url find in domain: ${domain.url}`);
 			}
 			return tomlFile.TRANSFER_SERVER_SEP0024;
 		} catch (error) {
-			throw new Error(`Failed to get the SEP24 url for domain: ${domain || this.testnetDomain}`);
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-24 URL Error: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to get the SEP-24 url for ${domain} domain: ${error}`);
 		}
 	}
 }

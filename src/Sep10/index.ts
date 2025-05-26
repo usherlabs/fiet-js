@@ -1,8 +1,9 @@
 import { Networks, Transaction } from '@stellar/stellar-sdk';
-import axios from 'axios';
-import { AuthParams, AuthResult } from '../types/SEP10-types';
-import { TESTNET_DOMAIN } from '../utils/constants';
-import { ResolveToml } from '../utils/resolveToml';
+import axios, { AxiosError } from 'axios';
+import { FietError } from '../common/types/fiet-error';
+import { AuthParams, AuthResult } from '../common/types/SEP10-types';
+import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { ResolveToml } from '../common/utils/resolveToml';
 
 /**
  * Handles SEP-10 authentication with anchors
@@ -47,7 +48,11 @@ export class Auth {
 			const data = await response.data;
 			return { token: data.token, account: account.publicKey() };
 		} catch (error) {
-			throw new Error(`Failed to authenticate with SEP10: ${error}`);
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-10 Error: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to authenticate with SEP-10: ${error}`);
 		}
 	}
 
@@ -61,11 +66,15 @@ export class Auth {
 			const tomlResolver = new ResolveToml({ anchorUrl: domain.url });
 			const tomlFile = await tomlResolver.getTomlFile();
 			if (!tomlFile.WEB_AUTH_ENDPOINT) {
-				throw new Error(`No SEP10 url find in domain: ${domain.url}`);
+				throw new Error(`No SEP-10 url find in domain: ${domain.url}`);
 			}
 			return { webAuthPoint: tomlFile.WEB_AUTH_ENDPOINT };
 		} catch (error) {
-			throw new Error(`Failed to get the SEP10 url for domain: ${domain || this.testnetDomain}`);
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-10 Error url: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to get the SEP-10 url for ${domain} domain. ${error} `);
 		}
 	}
 }
