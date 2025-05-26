@@ -1,7 +1,13 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { QuoteParams, QuoteResult, SEP38Info, SEP38InfoResponse } from '../types/SEP38-types';
-import { TESTNET_DOMAIN } from '../utils/constants';
-import { ResolveToml } from '../utils/resolveToml';
+import { FietError } from '../common/types/fiet-error';
+import {
+	QuoteParams,
+	QuoteResult,
+	SEP38Info,
+	SEP38InfoResponse,
+} from '../common/types/SEP38-types';
+import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { ResolveToml } from '../common/utils/resolveToml';
 
 export class Quote {
 	assetsHash: Record<string, { id: string }> = {};
@@ -46,10 +52,10 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new Error(`${axiosError.code}, error code: ${axiosError.status}`);
+				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
 			}
 
-			throw new Error(`Failed to get quote with SEP38`);
+			throw new Error(`Failed to get quote with SEP-38: ${error}`);
 		}
 	}
 
@@ -58,8 +64,12 @@ export class Quote {
 			const response: AxiosResponse = await axios.get(`${domain.infoUrl}/info`);
 			const data: SEP38InfoResponse = await response.data;
 			this.assetsMapping(data);
-		} catch {
-			throw new Error(`Failed to get SEP-38 info for domain: ${domain.infoUrl}`);
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-38 Error info domain: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to get SEP-38 info for domain: ${error}`);
 		}
 	}
 
@@ -89,7 +99,11 @@ export class Quote {
 			}
 			return { quotePoint: tomlFile.ANCHOR_QUOTE_SERVER };
 		} catch (error) {
-			throw new Error(`Failed to get the SEP38 url for domain: ${domain}`);
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-38 Error url: ${axiosError}, ${axiosError.code}`);
+			}
+			throw new Error(`Failed to get the SEP-38 url for ${domain} domain: ${error}`);
 		}
 	}
 }

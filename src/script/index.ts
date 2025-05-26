@@ -10,7 +10,7 @@ async function main() {
 	const { token } = await sep10.getAuthToken({ account });
 	const quote = new Quote();
 	const getQuote = await quote.getQuote({
-		base: 'USD',
+		base: 'SRT',
 		quote: 'USDC',
 		amount: '2',
 		authToken: token,
