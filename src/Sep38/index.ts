@@ -1,13 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { FietError } from '../common/types/fiet-error';
-import {
-	QuoteParams,
-	QuoteResult,
-	SEP38Info,
-	SEP38InfoResponse,
-} from '../common/types/SEP38-types';
+import { FietError } from '../common/error/fiet-error';
 import { TESTNET_DOMAIN } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
+import { QuoteParams, QuoteResult, SEP38Info, SEP38InfoResponse } from './types';
 
 export class Quote {
 	assetsHash: Record<string, { id: string }> = {};
@@ -55,7 +50,7 @@ export class Quote {
 				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
 			}
 
-			throw new Error(`Failed to get quote with SEP-38: ${error}`);
+			throw new Error(`SEP-38 Error: ${error}`);
 		}
 	}
 
@@ -67,15 +62,15 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error info domain: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`Failed to get SEP-38 info for domain: ${error}`);
+			throw new Error(`SEP-38 Error: ${error}`);
 		}
 	}
 
 	assetsMapping({ assets }: SEP38InfoResponse) {
 		if (assets.length === 0) {
-			throw new Error('Invalid SEP38 info');
+			throw new Error('Invalid SEP38 assets info');
 		}
 		assets.forEach((assetsInfo: SEP38Info) => {
 			const assetId = assetsInfo.asset;
@@ -101,9 +96,9 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error url: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`Failed to get the SEP-38 url for ${domain} domain: ${error}`);
+			throw new Error(`SEP-38 Error ${domain} domain: ${error}`);
 		}
 	}
 }
