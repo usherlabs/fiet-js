@@ -1,14 +1,17 @@
 {
+	"compileOnSave": false,
 	"compilerOptions": {
-		"target": "ES2019",
+		"target": "ES2022",
 		"module": "CommonJS",
-		"lib": ["ES2020", "DOM"], // change to ES2020 for NodeJs only
+		"lib": ["ES2022", "DOM"],
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"strict": true,
+		"importHelpers": true,
+		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
@@ -20,8 +23,10 @@
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"typeRoots": ["node_modules/@types"],
 		"forceConsistentCasingInFileNames": true
 	},
 	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist"]
+	"exclude": ["src/**/__mock__/*"]
 }
