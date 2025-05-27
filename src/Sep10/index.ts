@@ -1,9 +1,9 @@
 import { Networks, Transaction } from '@stellar/stellar-sdk';
 import axios, { AxiosError } from 'axios';
-import { FietError } from '../common/types/fiet-error';
-import { AuthParams, AuthResult } from '../common/types/SEP10-types';
+import { FietError } from '../common/error/fiet-error';
 import { TESTNET_DOMAIN } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
+import { AuthParams, AuthResult } from './types';
 
 /**
  * Handles SEP-10 authentication with anchors

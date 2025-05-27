@@ -1,12 +1,8 @@
 import axios, { AxiosError } from 'axios';
-import { FietError } from '../common/types/fiet-error';
-import {
-	DepositParams,
-	StellarTransactionResult,
-	WithdrawParamas,
-} from '../common/types/SEP24-types';
+import { FietError } from '../common/error/fiet-error';
 import { TESTNET_DOMAIN } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
+import { DepositParams, StellarTransactionResult, WithdrawParamas } from './types';
 
 export class InteractiveTransactions {
 	testnetDomain: string;

@@ -26,7 +26,7 @@ describe('SEP-38 Quote Integration Tests', () => {
 	});
 
 	describe('SEP-38 flow', () => {
-		it('should successfully get a quote with full asset discovery flow', async () => {
+		it('should successfully get a quote', async () => {
 			const mockResolveTomlInstance = {
 				getTomlFile: jest.fn().mockResolvedValue({
 					ANCHOR_QUOTE_SERVER: 'https://api.testanchor.stellar.org/sep38',
@@ -50,6 +50,23 @@ describe('SEP-38 Quote Integration Tests', () => {
 			// Verify ResolveToml was instantiated correctly
 			expect(MockedResolveToml).toHaveBeenCalledWith({ anchorUrl: mockDomain });
 			expect(mockResolveTomlInstance.getTomlFile).toHaveBeenCalled();
+			// Verify /price endpoint was called with correct parameters
+			expect(mockedAxios.get).toHaveBeenNthCalledWith(
+				2,
+				'https://api.testanchor.stellar.org/sep38/price',
+				{
+					params: {
+						sell_asset: 'iso4217:USD',
+						buy_asset: 'stellar:USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN',
+						sell_amount: '100',
+						context: 'sep6',
+					},
+					headers: {
+						Authorization: `Bearer ${mockAuthToken}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			);
 			// Verify the returned result
 			expect(result).toEqual({
 				price: '1.00',
@@ -66,6 +83,49 @@ describe('SEP-38 Quote Integration Tests', () => {
 					],
 				},
 			});
+
+			expect(quote.assetsHash).toEqual({
+				USD: { id: 'iso4217:USD' },
+				USDC: { id: 'stellar:USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN' },
+			});
+		});
+
+		it('should handle missing ANCHOR_QUOTE_SERVER', async () => {
+			const mockResolveTomlInstance = {
+				getTomlFile: jest.fn().mockResolvedValue({
+					WEB_AUTH_ENDPOINT: 'https://api.testanchor.stellar.org/auth',
+					// Missing ANCHOR_QUOTE_SERVER
+				}),
+			};
+
+			MockedResolveToml.mockImplementation(() => mockResolveTomlInstance);
+
+			await expect(
+				quote.getQuote({
+					base: 'USD',
+					quote: 'USDC',
+					amount: '100',
+					authToken: mockAuthToken,
+					domain: mockDomain,
+				})
+			).rejects.toThrow('No SEP38 url find in domain');
+		});
+	});
+
+	describe('Asset Mapping', () => {
+		it('should correctly map stellar assets', () => {
+			quote.assetsMapping(mockInfoResponse.data);
+
+			expect(quote.assetsHash).toEqual({
+				USDC: { id: 'stellar:USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN' },
+				USD: { id: 'iso4217:USD' },
+			});
+		});
+
+		it('should throw error for empty assets array', () => {
+			expect(() => {
+				quote.assetsMapping({ assets: [] });
+			}).toThrow('Invalid SEP38 assets info');
 		});
 	});
 });
