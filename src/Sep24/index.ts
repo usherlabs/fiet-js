@@ -2,7 +2,14 @@ import axios, { AxiosError } from 'axios';
 import { FietError } from '../common/error/fiet-error';
 import { TESTNET_DOMAIN } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
-import { AssetDetails, DepositParams, StellarTransactionResult, WithdrawParamas } from './types';
+import {
+	AssetDetails,
+	AssetInfoParams,
+	DepositParams,
+	StellarTransactionResult,
+	ValidateParams,
+	WithdrawParamas,
+} from './types';
 
 export class Sep24Transactions {
 	testnetDomain: string;
@@ -207,12 +214,12 @@ export class Sep24Transactions {
 		}
 	}
 
-	isAssetSupported({ assetCode, operation }: AssetInfo): boolean {
+	isAssetSupported({ assetCode, operation }: AssetInfoParams): boolean {
 		const asset = this.supportedAssets[operation][assetCode.toUpperCase()];
 		return asset ? asset.enabled : false;
 	}
 
-	getAssetDetails({ assetCode, operation }: AssetInfo): AssetDetails | null {
+	getAssetDetails({ assetCode, operation }: AssetInfoParams): AssetDetails | null {
 		return this.supportedAssets[operation][assetCode.toUpperCase()] || null;
 	}
 
@@ -229,25 +236,18 @@ export class Sep24Transactions {
 			}, {} as Record<string, AssetDetails>);
 	}
 
-	getAssetLimits({ assetCode, operation }: AssetInfo): { min: BigNumber; max: BigNumber } | null {
+	getAssetLimits({
+		assetCode,
+		operation,
+	}: AssetInfoParams): { min: BigNumber; max: BigNumber } | null {
 		const asset = this.supportedAssets[operation][assetCode.toUpperCase()];
 		return asset && asset.enabled ? { min: asset.minAmount, max: asset.maxAmount } : null;
 	}
 
-	validateAmount({ assetInfo, amount }: ValidatePramas): boolean {
+	validateAmount({ assetInfo, amount }: ValidateParams): boolean {
 		const asset = this.supportedAssets[assetInfo.operation][assetInfo.assetCode.toUpperCase()];
 		if (!asset || !asset.enabled) return false;
 
 		return amount >= asset.minAmount && amount <= asset.maxAmount;
 	}
-}
-
-interface AssetInfo {
-	assetCode: string;
-	operation: 'deposit' | 'withdraw';
-}
-
-interface ValidatePramas {
-	assetInfo: AssetInfo;
-	amount: BigNumber;
 }
