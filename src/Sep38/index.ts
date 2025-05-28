@@ -40,8 +40,8 @@ export class Quote {
 
 			return {
 				price: data.price,
-				sell_amount: data.sell_amount,
-				buy_amount: data.buy_amount,
+				sellAmount: data.sell_amount,
+				buyAmount: data.buy_amount,
 				fee: data.fee,
 			};
 		} catch (error) {

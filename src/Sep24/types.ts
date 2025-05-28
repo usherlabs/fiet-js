@@ -21,6 +21,12 @@ export interface WithdrawParamas {
 	quoteAmount: BigNumber;
 
 	/**
+	 * Token symbol to withdraw
+	 */
+	withdrawAsset?: string;
+	/**
+	 
+	/**
 	 * JWT authentication token obtained from SEP-10 Web Authentication
 	 * Required to authenticate the user with the anchor service
 	 */
@@ -51,6 +57,11 @@ export interface DepositParams {
 	 * This represents the amount the user wants to deposit from off-chain
 	 */
 	baseAmount: BigNumber;
+
+	/**
+	 * Token symbol to deposit
+	 */
+	depositAsset?: string;
 
 	/**
 	 * JWT authentication token obtained from SEP-10 Web Authentication
@@ -89,4 +100,36 @@ export interface StellarTransactionResult {
 	 * Can be used to track transaction status and for customer support
 	 */
 	anchorId: string;
+}
+
+/**
+ * Asset configuration and limits from SEP-24 info endpoint
+ */
+export interface AssetDetails {
+	/** Whether the asset is currently available for operations */
+	enabled: boolean;
+	/** Minimum transaction amount allowed */
+	minAmount: BigNumber;
+	/** Maximum transaction amount allowed */
+	maxAmount: BigNumber;
+}
+
+/**
+ * Asset information for SEP-24 operations
+ */
+export interface AssetInfoParams {
+	/** Asset code (e.g., 'USDC', 'SRT', 'native') */
+	assetCode: string;
+	/** Operation type: deposit or withdraw */
+	operation: 'deposit' | 'withdraw';
+}
+
+/**
+ * Parameters for validating asset transactions
+ */
+export interface ValidateParams {
+	/** Asset and operation information */
+	assetInfo: AssetInfoParams;
+	/** Transaction amount to validate against limits */
+	amount: BigNumber;
 }

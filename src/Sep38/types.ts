@@ -17,14 +17,14 @@ export interface QuoteParams {
 /**
  * Result of a successful SEP-38 quote request
  * @param price The quoted exchange rate
- * @param sell_amount The amount of the base asset to be sold (may include fees)
- * @param buy_amount The amount of the quote asset to be received
+ * @param sellAmount The amount of the base asset to be sold (may include fees)
+ * @param buyAmount The amount of the quote asset to be received
  * @param fee Optional fee information
  */
 export interface QuoteResult {
 	price: string;
-	sell_amount: string;
-	buy_amount: string;
+	sellAmount: string;
+	buyAmount: string;
 	fee?: Fee;
 }
 
