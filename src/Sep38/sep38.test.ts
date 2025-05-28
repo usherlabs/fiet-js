@@ -70,8 +70,8 @@ describe('SEP-38 Quote Integration Tests', () => {
 			// Verify the returned result
 			expect(result).toEqual({
 				price: '1.00',
-				sell_amount: '102.00',
-				buy_amount: '100.00',
+				sellAmount: '102.00',
+				buyAmount: '100.00',
 				fee: {
 					total: '2.00',
 					asset: 'iso4217:USD',

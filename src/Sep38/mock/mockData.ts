@@ -22,8 +22,8 @@ export const mockPriceResponse = {
 	data: {
 		total_price: '1.02',
 		price: '1.00',
-		sell_amount: '102.00',
-		buy_amount: '100.00',
+		sellAmount: '102.00',
+		buyAmount: '100.00',
 		fee: {
 			total: '2.00',
 			asset: 'iso4217:USD',

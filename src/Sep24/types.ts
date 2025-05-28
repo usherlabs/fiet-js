@@ -21,6 +21,12 @@ export interface WithdrawParamas {
 	quoteAmount: BigNumber;
 
 	/**
+	 * Token symbol to withdraw
+	 */
+	withdrawAsset?: string;
+	/**
+	 
+	/**
 	 * JWT authentication token obtained from SEP-10 Web Authentication
 	 * Required to authenticate the user with the anchor service
 	 */
@@ -52,6 +58,10 @@ export interface DepositParams {
 	 */
 	baseAmount: BigNumber;
 
+	/**
+	 * Token symbol to deposit
+	 */
+	depositAsset?: string;
 	/**
 	 * JWT authentication token obtained from SEP-10 Web Authentication
 	 * Required to authenticate the user with the anchor service
@@ -89,4 +99,10 @@ export interface StellarTransactionResult {
 	 * Can be used to track transaction status and for customer support
 	 */
 	anchorId: string;
+}
+
+export interface AssetDetails {
+	enabled: boolean;
+	minAmount: BigNumber;
+	maxAmount: BigNumber;
 }
