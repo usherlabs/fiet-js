@@ -5,18 +5,41 @@
 	"homepage": "https://fiet.finance/",
 	"author": "Usher Labs <labs@usher.so>",
 	"version": "0.0.1",
-	"main": "index.js",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"module": "./dist/index.js",
+	"files": [
+		"dist/**/*",
+		"README.md",
+		"package.json"
+	],
 	"scripts": {
+		"build": "tsc",
+		"build:watch": "tsc --watch",
+		"clean": "rimraf dist",
+		"prebuild": "npm run clean",
 		"test": "jest",
-		"main": "npx ts-node src/script/index.ts"
+		"example:auth": "npx ts-node examples/auth.ts",
+		"example:deposit": "npx ts-node examples/deposit.ts",
+		"example:withdraw": "npx ts-node examples/withdraw.ts",
+		"example:quote": "npx ts-node examples/quote.ts"
 	},
-	"keywords": [],
+	"keywords": [
+		"stellar",
+		"blockchain",
+		"defi",
+		"amm",
+		"sep-10",
+		"sep-24",
+		"sep-38"
+	],
 	"license": "ISC",
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"@types/node": "^22.15.18",
 		"jest": "^29.7.0",
 		"jest-fetch-mock": "^3.0.3",
+		"rimraf": "^6.0.1",
 		"ts-jest": "^29.3.4",
 		"ts-node": "^10.9.2",
 		"tslib": "^2.8.1",

@@ -24,10 +24,12 @@ async function main() {
 		amount: '2',
 		authToken,
 	});
+	
 	assert(quoteResponse.price, 'Invalid amount');
 	assert(quoteResponse.sellAmount, 'Invalid sell amount');
 	assert(quoteResponse.buyAmount, 'Invalid buy amount');
 	assert(quoteResponse.fee, 'Invalid fee details');
+	console.log('Quote response: ', quoteResponse);
 	console.log('Finish quote...');
 }
 
