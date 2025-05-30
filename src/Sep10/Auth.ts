@@ -45,7 +45,7 @@ export class Auth {
 
 			// Submit challenge
 			const response = await axios.post(webAuthPoint, { transaction: transaction.toXDR() });
-			const data = await response.data;
+			const data = response.data;
 			return { token: data.token, account: account.publicKey() };
 		} catch (error) {
 			if (axios.isAxiosError(error)) {

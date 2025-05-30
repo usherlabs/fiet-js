@@ -36,7 +36,7 @@ export class Quote {
 					'Content-Type': 'application/json',
 				},
 			});
-			const data = await response.data;
+			const data = response.data;
 
 			return {
 				price: data.price,
@@ -57,7 +57,7 @@ export class Quote {
 	async getInfo(domain: { infoUrl: string }) {
 		try {
 			const response: AxiosResponse = await axios.get(`${domain.infoUrl}/info`);
-			const data: SEP38InfoResponse = await response.data;
+			const data: SEP38InfoResponse = response.data;
 			this.assetsMapping(data);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
