@@ -4,7 +4,6 @@ import { BigNumber } from 'bignumber.js';
 import dotenv from 'dotenv';
 import { Auth } from '../src/Sep10';
 import { Sep24Transactions } from '../src/Sep24';
-import { Quote } from '../src/Sep38';
 dotenv.config();
 /**
  * Get interactive URL for deposit
@@ -19,20 +18,15 @@ async function main() {
 	// Get auth token via SEP-10
 	const sep10 = new Auth();
 	const { token: authToken } = await sep10.getAuthToken({ account });
-	const quote = new Quote();
-	await quote.getQuote({
-		base: 'USD',
-		quote: 'USDC',
-		amount: '2',
-		authToken,
-	});
+
 	// Init SEP-24 class
 	const sep24 = new Sep24Transactions();
 	const depositTx = await sep24.performDeposit({
 		address: account.publicKey(),
-		baseAmount: BigNumber('11'),
+		baseAmount: BigNumber('10'),
 		authToken,
 	});
+	console.log('Deposit response: ', depositTx);
 	assert(depositTx.type, 'Invlid type');
 	assert(depositTx.url, 'Invlid Url');
 	assert(depositTx.anchorId, 'Invlid Anchor id');
