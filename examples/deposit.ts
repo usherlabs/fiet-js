@@ -21,15 +21,16 @@ async function main() {
 
 	// Init SEP-24 class
 	const sep24 = new Sep24Transactions();
-	const depositTx = await sep24.performDeposit({
+	const depositResponse = await sep24.performDeposit({
 		address: account.publicKey(),
 		baseAmount: BigNumber('10'),
 		authToken,
 	});
-	console.log('Deposit response: ', depositTx);
-	assert(depositTx.type, 'Invlid type');
-	assert(depositTx.url, 'Invlid Url');
-	assert(depositTx.anchorId, 'Invlid Anchor id');
+
+	assert(depositResponse.type, 'Invlid type');
+	assert(depositResponse.url, 'Invlid Url');
+	assert(depositResponse.anchorId, 'Invlid Anchor id');
+	console.log('Deposit response: ', depositResponse);
 	console.log('Finished deposit...');
 }
 

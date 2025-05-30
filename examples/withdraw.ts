@@ -20,14 +20,15 @@ async function main() {
 	const { token: authToken } = await sep10.getAuthToken({ account });
 	// Init SEP-24 class
 	const sep24 = new Sep24Transactions();
-	const withdrawTx = await sep24.performWithdraw({
+	const withdrawResponse = await sep24.performWithdraw({
 		address: account.publicKey(),
 		quoteAmount: BigNumber('5'),
 		authToken,
 	});
-	assert(withdrawTx.type, 'Invlid type');
-	assert(withdrawTx.url, 'Invlid Url');
-	assert(withdrawTx.anchorId, 'Invlid Anchor id');
+	assert(withdrawResponse.type, 'Invlid type');
+	assert(withdrawResponse.url, 'Invlid Url');
+	assert(withdrawResponse.anchorId, 'Invlid Anchor id');
+	console.log('Withdraw response: ', withdrawResponse);
 	console.log('Finish withdraw...');
 }
 
