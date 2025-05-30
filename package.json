@@ -14,8 +14,15 @@
 		"package.json"
 	],
 	"scripts": {
+		"build": "tsc",
+		"build:watch": "tsc --watch",
+		"clean": "rimraf dist",
+		"prebuild": "npm run clean",
 		"test": "jest",
-		"main": "npx ts-node src/script/index.ts"
+		"example:auth": "npx ts-node examples/auth.ts",
+		"example:deposit": "npx ts-node examples/deposit.ts",
+		"example:withdraw": "npx ts-node examples/withdraw.ts",
+		"example:quote": "npx ts-node examples/quote.ts"
 	},
 	"keywords": [
 		"stellar",
