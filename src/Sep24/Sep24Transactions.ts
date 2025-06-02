@@ -1,18 +1,19 @@
 import axios, { AxiosError } from 'axios';
 import { FietError } from '../common/error/fiet-error';
-import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { TESTNET_ANCHOR } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
 import {
 	AssetDetails,
 	AssetInfoParams,
 	DepositParams,
 	StellarTransactionResult,
+	TransactionStatus,
 	ValidateParams,
 	WithdrawParamas,
 } from './types';
 
 export class Sep24Transactions {
-	testnetDomain: string;
+	testnetAnchor: string;
 	isInitialized: boolean = false;
 	supportedAssets: {
 		deposit: Record<string, AssetDetails>;
@@ -24,7 +25,7 @@ export class Sep24Transactions {
 	 * @param options Configuration options
 	 */
 	constructor(options?: { domain: string }) {
-		this.testnetDomain = options?.domain || TESTNET_DOMAIN;
+		this.testnetAnchor = options?.domain || TESTNET_ANCHOR;
 	}
 
 	/**
@@ -32,7 +33,7 @@ export class Sep24Transactions {
 	 */
 	async init({ domain }: { domain?: string }) {
 		try {
-			const anchorDomain = domain || this.testnetDomain;
+			const anchorDomain = domain || this.testnetAnchor;
 			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
 			await this.getSupportedAssets({ infoUrl: sep24Url });
 		} catch (error) {
@@ -55,7 +56,7 @@ export class Sep24Transactions {
 		domain,
 	}: DepositParams): Promise<StellarTransactionResult> {
 		try {
-			const anchorDomain = domain || this.testnetDomain;
+			const anchorDomain = domain || this.testnetAnchor;
 			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
 			if (!this.isInitialized) {
 				await this.getSupportedAssets({ infoUrl: sep24Url });
@@ -113,7 +114,7 @@ export class Sep24Transactions {
 		domain,
 	}: WithdrawParamas): Promise<StellarTransactionResult> {
 		try {
-			const anchorDomain = domain || this.testnetDomain;
+			const anchorDomain = domain || this.testnetAnchor;
 			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
 			if (!this.isInitialized) {
 				await this.getSupportedAssets({ infoUrl: sep24Url });
@@ -229,6 +230,40 @@ export class Sep24Transactions {
 				throw new Error(`SEP-24 Assets : ${error.message}`);
 			}
 			throw new Error('SEP-24 Assets : An unknown error occured');
+		}
+	}
+
+	async getTxStatus({
+		id,
+		authToken,
+		domain,
+	}: {
+		id: string;
+		authToken: string;
+		domain?: string;
+	}): Promise<TransactionStatus> {
+		try {
+			const anchorDomain = domain || this.testnetAnchor;
+			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
+			const response = await axios.get(`${sep24Url!}/transaction`, {
+				params: {
+					id,
+				},
+				headers: {
+					Authorization: `Bearer ${authToken}`,
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+			});
+			return response.data;
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError;
+				throw new FietError(`SEP-24 Transaction status: ${axiosError}, ${axiosError.code}`);
+			}
+			if (error instanceof Error) {
+				throw new Error(`SEP-24 Transaction status : ${error.message}`);
+			}
+			throw new Error('SEP-24 Transaction status : An unknown error occured');
 		}
 	}
 

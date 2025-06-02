@@ -1,5 +1,5 @@
 // Support to create Muxed addresses
-export { StellarMuxedAccounts } from './address/StellarMuxedAccounts';
+export { StellarAccount, StellarMuxedAccounts } from './address';
 
 // SEP-10
 export { Auth, AuthParams, AuthResult } from './Sep10';

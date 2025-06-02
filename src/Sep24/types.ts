@@ -133,3 +133,22 @@ export interface ValidateParams {
 	/** Transaction amount to validate against limits */
 	amount: BigNumber;
 }
+
+export interface TransactionStatus{
+		id: string,
+    kind: string,
+    status: string,
+    more_info_url: string,
+    amount_in?: string,
+    amount_in_asset?: string,
+    amount_out?: string,
+    amount_out_asset?: string,
+    fee_details?: {
+      total: string,
+      asset: string
+    },
+    started_at: string,
+    message: string,
+    refunded: boolean,
+    to: string
+}

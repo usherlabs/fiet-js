@@ -22,7 +22,7 @@ async function main() {
 	const quote = new Quote();
 	const quoteResponse = await quote.getQuote({
 		base: 'USD',
-		quote: 'US',
+		quote: 'USDC',
 		amount,
 		authToken,
 	});

@@ -1,24 +1,24 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { FietError } from '../common/error/fiet-error';
-import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { TESTNET_ANCHOR } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
 import { QuoteParams, QuoteResult, SEP38Info, SEP38InfoResponse } from './types';
 
 export class Quote {
 	assetsHash: Record<string, { id: string }> = {};
-	testnetDomain: string;
+	testnetAnchor: string;
 
 	/**
 	 * Create a new Quote instance
 	 * @param options Configuration options
 	 */
 	constructor(options?: { domain?: string }) {
-		this.testnetDomain = options?.domain || TESTNET_DOMAIN;
+		this.testnetAnchor = options?.domain || TESTNET_ANCHOR;
 	}
 
 	async getQuote({ base, quote, amount, authToken, domain }: QuoteParams): Promise<QuoteResult> {
 		try {
-			const anchorDomain = domain || this.testnetDomain;
+			const anchorDomain = domain || this.testnetAnchor;
 			const { quotePoint: quoteUrl } = await this.getQuotePoint({ url: anchorDomain });
 
 			if (Object.keys(this.assetsHash).length === 0) {
