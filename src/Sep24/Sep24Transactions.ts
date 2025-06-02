@@ -13,7 +13,7 @@ import {
 
 export class Sep24Transactions {
 	testnetDomain: string;
-	isAssetLoaded: boolean = false;
+	isInitialized: boolean = false;
 	supportedAssets: {
 		deposit: Record<string, AssetDetails>;
 		withdraw: Record<string, AssetDetails>;
@@ -27,19 +27,23 @@ export class Sep24Transactions {
 		this.testnetDomain = options?.domain || TESTNET_DOMAIN;
 	}
 
+	/**
+	 * Ideal to call init() before performing deposit or withdraw
+	 */
 	async init({ domain }: { domain?: string }) {
 		try {
 			const anchorDomain = domain || this.testnetDomain;
 			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
 			await this.getSupportedAssets({ infoUrl: sep24Url });
-			this.isAssetLoaded = true;
 		} catch (error) {
-			this.isAssetLoaded = false;
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
 				throw new FietError(`SEP-24 Init: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-24 Init: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-24 Init: ${error.message}`);
+			}
+			throw new Error('SEP-24 Init: An unknown error occured');
 		}
 	}
 
@@ -53,7 +57,7 @@ export class Sep24Transactions {
 		try {
 			const anchorDomain = domain || this.testnetDomain;
 			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
-			if (!this.isAssetLoaded) {
+			if (!this.isInitialized) {
 				await this.getSupportedAssets({ infoUrl: sep24Url });
 			}
 			// Check if `depositAsset` supported
@@ -94,7 +98,10 @@ export class Sep24Transactions {
 				const axiosError = error as AxiosError;
 				throw new FietError(`SEP-24 Deposit: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-24 Deposit: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-24 Deposit: ${error.message}`);
+			}
+			throw new Error('SEP-24 Deposit: An unknown error occured');
 		}
 	}
 
@@ -108,7 +115,7 @@ export class Sep24Transactions {
 		try {
 			const anchorDomain = domain || this.testnetDomain;
 			const sep24Url = await this.getSEP24Point({ url: anchorDomain });
-			if (!this.isAssetLoaded) {
+			if (!this.isInitialized) {
 				await this.getSupportedAssets({ infoUrl: sep24Url });
 			}
 
@@ -148,7 +155,10 @@ export class Sep24Transactions {
 				const axiosError = error as AxiosError;
 				throw new FietError(`SEP-24 Withdraw: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-24 Withdraw: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-24 Withdraw: ${error.message}`);
+			}
+			throw new Error('SEP-24 Withdraw: An unknown error occured');
 		}
 	}
 
@@ -170,7 +180,10 @@ export class Sep24Transactions {
 				const axiosError = error as AxiosError;
 				throw new FietError(`SEP-24 URL : ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-24 URL: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-24 URL: ${error.message}`);
+			}
+			throw new Error('SEP-24 URL: An unknown error occured');
 		}
 	}
 
@@ -205,21 +218,32 @@ export class Sep24Transactions {
 					{} as Record<string, AssetDetails>
 				);
 			}
+			this.isInitialized = true;
 		} catch (error) {
+			this.isInitialized = false;
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-24 Supported Assets : ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-24 Assets : ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-24 Supported Assets: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-24 Assets : ${error.message}`);
+			}
+			throw new Error('SEP-24 Assets : An unknown error occured');
 		}
 	}
 
 	isAssetSupported({ assetCode, operation }: AssetInfoParams): boolean {
+		if (!this.isInitialized) {
+			throw new Error('Initilaized first');
+		}
 		const asset = this.supportedAssets[operation][assetCode.toUpperCase()];
 		return asset ? asset.enabled : false;
 	}
 
 	getAssetDetails({ assetCode, operation }: AssetInfoParams): AssetDetails | null {
+		if (!this.isInitialized) {
+			throw new Error('Initilaized first');
+		}
 		return this.supportedAssets[operation][assetCode.toUpperCase()] || null;
 	}
 
@@ -228,6 +252,9 @@ export class Sep24Transactions {
 	}: {
 		operation: 'deposit' | 'withdraw';
 	}): Record<string, AssetDetails> {
+		if (!this.isInitialized) {
+			throw new Error('Initilaized first');
+		}
 		return Object.entries(this.supportedAssets[operation])
 			.filter(([_, asset]) => asset.enabled)
 			.reduce((acc, [code, asset]) => {
@@ -240,11 +267,17 @@ export class Sep24Transactions {
 		assetCode,
 		operation,
 	}: AssetInfoParams): { min: BigNumber; max: BigNumber } | null {
+		if (!this.isInitialized) {
+			throw new Error('Initilaized first');
+		}
 		const asset = this.supportedAssets[operation][assetCode.toUpperCase()];
 		return asset && asset.enabled ? { min: asset.minAmount, max: asset.maxAmount } : null;
 	}
 
 	validateAmount({ assetInfo, amount }: ValidateParams): boolean {
+		if (!this.isInitialized) {
+			throw new Error('Initilaized first');
+		}
 		const asset = this.supportedAssets[assetInfo.operation][assetInfo.assetCode.toUpperCase()];
 		if (!asset || !asset.enabled) return false;
 

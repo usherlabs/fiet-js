@@ -50,9 +50,12 @@ export class Auth {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-10 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-10: ${axiosError}`, axiosError.code);
 			}
-			throw new Error(`Failed to authenticate with SEP-10: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-10: ${error.message}`);
+			}
+			throw new Error('SEP-10: An unknown error occured');
 		}
 	}
 
@@ -72,9 +75,12 @@ export class Auth {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-10 Error url: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-10 Url: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`Failed to get the SEP-10 url for ${domain} domain. ${error} `);
+			if (error instanceof Error) {
+				throw new Error(`SEP-10 Url: ${error.message}`);
+			}
+			throw new Error('SEP-10 Url: An unknown error occured');
 		}
 	}
 }

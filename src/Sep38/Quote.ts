@@ -24,6 +24,13 @@ export class Quote {
 			if (Object.keys(this.assetsHash).length === 0) {
 				await this.getInfo({ infoUrl: quoteUrl });
 			}
+			// Checking if both base and quote supported
+			const baseExists = this.assetsHash[base];
+			const quoteExists = this.assetsHash[quote];
+
+			if (!baseExists || !quoteExists) {
+				throw new Error(`Unsupported token: ${baseExists ? quote : base}`);
+			}
 			const response = await axios.get(`${quoteUrl}/price`, {
 				params: {
 					sell_asset: this.assetsHash[base].id,
@@ -47,10 +54,12 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38: ${axiosError.response}`, axiosError.code);
 			}
-
-			throw new Error(`SEP-38 Error: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-38: ${error.message}`);
+			}
+			throw new Error(`SEP-38: An unknown error occurred`);
 		}
 	}
 
@@ -62,9 +71,12 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38 Info: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-38 Error: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-38 Info: ${error.message}`);
+			}
+			throw new Error('SEP-38 Info: An unknown error occurred');
 		}
 	}
 
@@ -96,9 +108,12 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38 Url: ${axiosError}`, axiosError.code);
 			}
-			throw new Error(`SEP-38 Error ${domain} domain: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP38 Url: ${error.message}`);
+			}
+			throw new Error(`SEP-38 Url: An unknown error occurred`);
 		}
 	}
 }
