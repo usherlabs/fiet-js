@@ -16,8 +16,8 @@ export class Auth {
 	 * Create a new Auth instance
 	 * @param options Configuration options
 	 */
-	constructor(options?: { networkPassPharse: Networks; domain: string }) {
-		this.networkPassphrase = options?.networkPassPharse || Networks.TESTNET;
+	constructor(options?: { networkPassphrase: Networks; domain: string }) {
+		this.networkPassphrase = options?.networkPassphrase || Networks.TESTNET;
 		this.testnetAnchor = options?.domain || TESTNET_ANCHOR;
 	}
 

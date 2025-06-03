@@ -4,6 +4,17 @@ Fiet.js SDK built on top of Stellar SDK - SEP Implementation
 
 A comprehensive TypeScript SDK for implementing Stellar Ecosystem Proposals (SEPs) including authentication, deposits, withdrawals, and quotes.
 
+## Installation
+
+```bash
+npm install @fiet/js
+# or
+yarn add @fiet/js
+# or
+pnpm add @fiet/js
+
+```
+
 ## Features
 
 - SEP-10 Web Authentication - Secure authentication with Stellar anchors.
@@ -11,3 +22,7 @@ A comprehensive TypeScript SDK for implementing Stellar Ecosystem Proposals (SEP
 - SEP-38 Anchor RFQ API - Real-time quotes and asset exchange rates.
 - Muxed Account Support - Virtual sub-accounts for shared Stellar accounts.
 - Load Stellar Account with the help of StellarAccount class.
+
+```
+
+```
