@@ -1,0 +1,24 @@
+{
+	"prettier.useTabs": true,
+	"editor.tabCompletion": "on",
+	"eslint.codeActionsOnSave.rules": null,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit",
+		"source.organizeImports": "explicit"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"typescript.preferences.importModuleSpecifier": "relative",
+	"typescript.preferences.quoteStyle": "single",
+	"prettier.semi": true,
+	"prettier.singleQuote": true,
+	"prettier.tabWidth": 2,
+	"prettier.printWidth": 100,
+
+	"jest.runMode": "on-demand",
+	"testing.followRunningTest": false
+}

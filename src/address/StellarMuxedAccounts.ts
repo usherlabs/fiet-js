@@ -11,6 +11,9 @@ export class StellarMuxedAccounts {
 		sequence: string;
 	}): { muxedAddress: string } {
 		try {
+			if (!StrKey.isValidEd25519PublicKey(baseAccount)) {
+				throw new Error('Invalid base account');
+			}
 			// Create a new MuxedAccount using the base account and the ID
 			const muxedAccount = new MuxedAccount(new Account(baseAccount, sequence), id);
 			return { muxedAddress: muxedAccount.accountId() };

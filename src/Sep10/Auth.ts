@@ -1,7 +1,7 @@
 import { Networks, Transaction } from '@stellar/stellar-sdk';
 import axios, { AxiosError } from 'axios';
 import { FietError } from '../common/error/fiet-error';
-import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { TESTNET_ANCHOR } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
 import { AuthParams, AuthResult } from './types';
 
@@ -10,7 +10,7 @@ import { AuthParams, AuthResult } from './types';
  */
 export class Auth {
 	networkPassphrase: Networks;
-	testnetDomain: string;
+	testnetAnchor: string;
 
 	/**
 	 * Create a new Auth instance
@@ -18,7 +18,7 @@ export class Auth {
 	 */
 	constructor(options?: { networkPassPharse: Networks; domain: string }) {
 		this.networkPassphrase = options?.networkPassPharse || Networks.TESTNET;
-		this.testnetDomain = options?.domain || TESTNET_DOMAIN;
+		this.testnetAnchor = options?.domain || TESTNET_ANCHOR;
 	}
 
 	/**
@@ -28,7 +28,7 @@ export class Auth {
 	 */
 	async getAuthToken({ account, domain }: AuthParams): Promise<AuthResult> {
 		try {
-			const anchorDomain = domain || this.testnetDomain;
+			const anchorDomain = domain || this.testnetAnchor;
 			const { webAuthPoint } = await this.getWebAuthPoint({ url: anchorDomain });
 			// get SEP10 challenge transactions
 			const responseChallenge = await axios.get(webAuthPoint, {
@@ -50,9 +50,12 @@ export class Auth {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-10 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-10: ${axiosError}`, axiosError.code);
 			}
-			throw new Error(`Failed to authenticate with SEP-10: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-10: ${error.message}`);
+			}
+			throw new Error('SEP-10: An unknown error occured');
 		}
 	}
 
@@ -72,9 +75,12 @@ export class Auth {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-10 Error url: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-10 Url: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`Failed to get the SEP-10 url for ${domain} domain. ${error} `);
+			if (error instanceof Error) {
+				throw new Error(`SEP-10 Url: ${error.message}`);
+			}
+			throw new Error('SEP-10 Url: An unknown error occured');
 		}
 	}
 }

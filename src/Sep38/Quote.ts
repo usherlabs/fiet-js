@@ -1,28 +1,35 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { FietError } from '../common/error/fiet-error';
-import { TESTNET_DOMAIN } from '../common/utils/constants';
+import { TESTNET_ANCHOR } from '../common/utils/constants';
 import { ResolveToml } from '../common/utils/resolveToml';
 import { QuoteParams, QuoteResult, SEP38Info, SEP38InfoResponse } from './types';
 
 export class Quote {
 	assetsHash: Record<string, { id: string }> = {};
-	testnetDomain: string;
+	testnetAnchor: string;
 
 	/**
 	 * Create a new Quote instance
 	 * @param options Configuration options
 	 */
-	constructor(options?: { domain?: string }) {
-		this.testnetDomain = options?.domain || TESTNET_DOMAIN;
+	constructor(options?: { domain: string }) {
+		this.testnetAnchor = options?.domain || TESTNET_ANCHOR;
 	}
 
 	async getQuote({ base, quote, amount, authToken, domain }: QuoteParams): Promise<QuoteResult> {
 		try {
-			const anchorDomain = domain || this.testnetDomain;
+			const anchorDomain = domain || this.testnetAnchor;
 			const { quotePoint: quoteUrl } = await this.getQuotePoint({ url: anchorDomain });
 
 			if (Object.keys(this.assetsHash).length === 0) {
 				await this.getInfo({ infoUrl: quoteUrl });
+			}
+			// Checking if both base and quote supported
+			const baseExists = this.assetsHash[base];
+			const quoteExists = this.assetsHash[quote];
+
+			if (!baseExists || !quoteExists) {
+				throw new Error(`Unsupported token: ${baseExists ? quote : base}`);
 			}
 			const response = await axios.get(`${quoteUrl}/price`, {
 				params: {
@@ -47,10 +54,12 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38: ${axiosError.response}`, axiosError.code);
 			}
-
-			throw new Error(`SEP-38 Error: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-38: ${error.message}`);
+			}
+			throw new Error(`SEP-38: An unknown error occurred`);
 		}
 	}
 
@@ -62,9 +71,12 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38 Info: ${axiosError}, ${axiosError.code}`);
 			}
-			throw new Error(`SEP-38 Error: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP-38 Info: ${error.message}`);
+			}
+			throw new Error('SEP-38 Info: An unknown error occurred');
 		}
 	}
 
@@ -96,9 +108,12 @@ export class Quote {
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
-				throw new FietError(`SEP-38 Error: ${axiosError}, ${axiosError.code}`);
+				throw new FietError(`SEP-38 Url: ${axiosError}`, axiosError.code);
 			}
-			throw new Error(`SEP-38 Error ${domain} domain: ${error}`);
+			if (error instanceof Error) {
+				throw new Error(`SEP38 Url: ${error.message}`);
+			}
+			throw new Error(`SEP-38 Url: An unknown error occurred`);
 		}
 	}
 }
