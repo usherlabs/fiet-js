@@ -12,7 +12,7 @@ export class Quote {
 	 * Create a new Quote instance
 	 * @param options Configuration options
 	 */
-	constructor(options?: { domain?: string }) {
+	constructor(options?: { domain: string }) {
 		this.testnetAnchor = options?.domain || TESTNET_ANCHOR;
 	}
 

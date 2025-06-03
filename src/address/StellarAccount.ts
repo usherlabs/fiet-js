@@ -4,8 +4,8 @@ import { STELLAR_TESTNET_URL } from '../common/utils/constants';
 export class StellarAccount {
 	horizonServer: Horizon.Server;
 
-	constructor(option: { url?: string }) {
-		this.horizonServer = new Horizon.Server(option.url || STELLAR_TESTNET_URL);
+	constructor(option?: { url: string }) {
+		this.horizonServer = new Horizon.Server(option?.url || STELLAR_TESTNET_URL);
 	}
 
 	async getSequence({ address }: { address: string }) {

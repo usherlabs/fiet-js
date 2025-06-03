@@ -254,7 +254,7 @@ export class Sep24Transactions {
 					'Content-Type': 'application/x-www-form-urlencoded',
 				},
 			});
-			return response.data;
+			return response.data.transaction;
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError;
