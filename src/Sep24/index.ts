@@ -1,9 +1,9 @@
-export { Sep24Transactions } from './Sep24Transactions';
+export { Sep24Transactions } from "./Sep24Transactions";
 export type {
-	AssetDetails,
-	AssetInfoParams,
-	DepositParams,
-	StellarTransactionResult,
-	ValidateParams,
-	WithdrawParamas,
-} from './types';
+  AssetDetails,
+  AssetInfoParams,
+  DepositParams,
+  StellarTransactionResult,
+  ValidateParams,
+  WithdrawParamas,
+} from "./types";

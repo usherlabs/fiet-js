@@ -7,11 +7,11 @@
  * @param domain Optional domain of the anchor (defaults to testnet anchor if not provided)
  */
 export interface QuoteParams {
-	base: string;
-	quote: string;
-	amount: string;
-	authToken: string;
-	domain?: string;
+  base: string;
+  quote: string;
+  amount: string;
+  authToken: string;
+  domain?: string;
 }
 
 /**
@@ -22,10 +22,10 @@ export interface QuoteParams {
  * @param fee Optional fee information
  */
 export interface QuoteResult {
-	price: string;
-	sellAmount: string;
-	buyAmount: string;
-	fee?: Fee;
+  price: string;
+  sellAmount: string;
+  buyAmount: string;
+  fee?: Fee;
 }
 
 /**
@@ -35,9 +35,9 @@ export interface QuoteResult {
  * @param details Optional breakdown of the fee components
  */
 interface Fee {
-	total: string;
-	asset: string;
-	details?: Details[];
+  total: string;
+  asset: string;
+  details?: Details[];
 }
 
 /**
@@ -47,9 +47,9 @@ interface Fee {
  * @param amount The amount of this specific fee component
  */
 interface Details {
-	name: string;
-	description?: string;
-	amount: string;
+  name: string;
+  description?: string;
+  amount: string;
 }
 
 /**
@@ -57,7 +57,7 @@ interface Details {
  * @param assets Array of assets available for trading
  */
 export interface SEP38InfoResponse {
-	assets: SEP38Info[];
+  assets: SEP38Info[];
 }
 
 /**
@@ -68,10 +68,10 @@ export interface SEP38InfoResponse {
  * @param buy_delivery_methods Optional array of methods for receiving the asset when buying
  */
 export interface SEP38Info {
-	asset: string;
-	country_codes?: string[];
-	sell_delivery_methods?: DeliveryMethod[];
-	buy_delivery_methods?: DeliveryMethod[];
+  asset: string;
+  country_codes?: string[];
+  sell_delivery_methods?: DeliveryMethod[];
+  buy_delivery_methods?: DeliveryMethod[];
 }
 /**
  * Information about a delivery method for an asset
@@ -79,6 +79,6 @@ export interface SEP38Info {
  * @param description Human-readable description of the delivery method
  */
 export interface DeliveryMethod {
-	name: string;
-	description: string;
+  name: string;
+  description: string;
 }
