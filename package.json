@@ -19,7 +19,6 @@
 		"clean": "rimraf dist",
 		"prebuild": "npm run clean",
 		"test": "jest",
-		"example:auth": "npx ts-node examples/auth.ts",
 		"example:deposit": "npx ts-node examples/deposit.ts",
 		"example:withdraw": "npx ts-node examples/withdraw.ts",
 		"example:quote": "npx ts-node examples/quote.ts",
