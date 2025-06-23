@@ -1,8 +1,8 @@
 export class FietError extends Error {
-	errorCode?: string;
+  errorCode?: string;
 
-	constructor(message: string, errorCode?: string) {
-		super(message);
-		this.errorCode = errorCode;
-	}
+  constructor(message: string, errorCode?: string) {
+    super(message);
+    this.errorCode = errorCode;
+  }
 }

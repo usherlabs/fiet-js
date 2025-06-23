@@ -1,2 +1,2 @@
-export { StellarAccount } from './StellarAccount';
-export { StellarMuxedAccounts } from './StellarMuxedAccounts';
+export { StellarAccount } from "./StellarAccount";
+export { StellarMuxedAccounts } from "./StellarMuxedAccounts";
